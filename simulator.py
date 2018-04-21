@@ -61,11 +61,11 @@ def RR_scheduling(process_list, time_quantum ):
 
     for process in process_list:
         if(current_time < process.arrive_time):
-            while(len(waiting_list) != 0 and current_time < process.arrive_time):
+            while(len(waiting_list) != 0):
                 continue_process = waiting_list.pop(0)
                 schedule.append((current_time, continue_process.id))
                 waiting_time += current_time - continue_process.arrive_time
-                if(continue_process.burst_time < time_quantum):
+                if(continue_process.burst_time <= time_quantum):
                     current_time += continue_process.burst_time
                 else:
                     current_time += time_quantum
@@ -75,7 +75,7 @@ def RR_scheduling(process_list, time_quantum ):
                     current_time = process.arrive_time
                 schedule.append((current_time, process.id))
                 waiting_time += current_time - process.arrive_time
-                if(process.burst_time < time_quantum):
+                if(process.burst_time <= time_quantum):
                     current_time += process.burst_time
                 else:
                     current_time += time_quantum
@@ -83,7 +83,7 @@ def RR_scheduling(process_list, time_quantum ):
             else:
                 schedule.append((current_time, process.id))
                 waiting_time += current_time - process.arrive_time
-                if(process.burst_time < time_quantum):
+                if(process.burst_time <= time_quantum):
                     current_time += process.burst_time
                 else:
                     current_time += time_quantum
@@ -91,11 +91,15 @@ def RR_scheduling(process_list, time_quantum ):
         else:
             schedule.append((current_time, process.id))
             waiting_time += current_time - process.arrive_time
-            if(process.burst_time < time_quantum):
+            if(process.burst_time <= time_quantum):
                 current_time += process.burst_time
             else:
                 current_time += time_quantum
                 waiting_list.append(Process(process.id, process.arrive_time, process.burst_time-time_quantum))
+        print("current process: %d", process.id)
+        print("current time: %d", current_time)
+        for wait in waiting_list:
+            print(wait)
     average_waiting_time = waiting_time/float(len(process_list))
     return schedule, average_waiting_time
 

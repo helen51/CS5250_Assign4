@@ -32,6 +32,16 @@ class Process:
     def __repr__(self):
         return ('[id %d : arrive_time %d,  burst_time %d]'%(self.id, self.arrive_time, self.burst_time))
 
+class Stack_Process:
+    last_scheduled_time = 0
+    def __init__(self, id, arrive_time, burst_time, stack_time):
+        self.id = id
+        self.arrive_time = arrive_time
+        self.burst_time = burst_time
+        self.stack_time = stack_time
+    def __repr__(self):
+        return ('[id %d : arrive_time %d,  burst_time %d, stack_time %d]'%(self.id, self.arrive_time, self.burst_time, self.stack_time))
+
 def FCFS_scheduling(process_list):
     #store the (switching time, proccess_id) pair
     schedule = []
@@ -61,7 +71,7 @@ def RR_scheduling(process_list, time_quantum ):
 
     for process in process_list:
         if(current_time < process.arrive_time):
-            while(len(waiting_list) != 0):
+            while(len(waiting_list) != 0 and waiting_list[0].stack_time <= process.arrive_time):
                 continue_process = waiting_list.pop(0)
                 schedule.append((current_time, continue_process.id))
                 waiting_time += current_time - continue_process.arrive_time
@@ -69,7 +79,7 @@ def RR_scheduling(process_list, time_quantum ):
                     current_time += continue_process.burst_time
                 else:
                     current_time += time_quantum
-                    waiting_list.append(Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum))
+                    waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))
             if(len(waiting_list) == 0):
                 if(current_time < process.arrive_time):
                     current_time = process.arrive_time
@@ -79,7 +89,7 @@ def RR_scheduling(process_list, time_quantum ):
                     current_time += process.burst_time
                 else:
                     current_time += time_quantum
-                    waiting_list.append(Process(process.id, process.arrive_time, process.burst_time-time_quantum))
+                    waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
             else:
                 schedule.append((current_time, process.id))
                 waiting_time += current_time - process.arrive_time
@@ -87,19 +97,43 @@ def RR_scheduling(process_list, time_quantum ):
                     current_time += process.burst_time
                 else:
                     current_time += time_quantum
-                    waiting_list.append(Process(process.id, process.arrive_time, process.burst_time-time_quantum))
+                    waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
         else:
+            while(len(waiting_list) != 0):
+                if(waiting_list[0].stack_time <= process.arrive_time):
+                    continue_process = waiting_list.pop(0)
+                    schedule.append((current_time, continue_process.id))
+                    waiting_time += current_time - continue_process.arrive_time
+                    if(continue_process.burst_time <= time_quantum):
+                        current_time += continue_process.burst_time
+                    else:
+                        current_time += time_quantum
+                        waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))
+                else:
+                    break;
             schedule.append((current_time, process.id))
             waiting_time += current_time - process.arrive_time
             if(process.burst_time <= time_quantum):
                 current_time += process.burst_time
             else:
                 current_time += time_quantum
-                waiting_list.append(Process(process.id, process.arrive_time, process.burst_time-time_quantum))
-        print("current process: %d", process.id)
-        print("current time: %d", current_time)
+                waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
+        # print("current process: ", process.id)
+        # print("current time: ", current_time)
         for wait in waiting_list:
             print(wait)
+
+    while(len(waiting_list) != 0):
+        continue_process = waiting_list.pop(0)
+        schedule.append((current_time, continue_process.id))
+        waiting_time += current_time - continue_process.arrive_time
+        if(continue_process.burst_time <= time_quantum):
+            current_time += continue_process.burst_time
+        else:
+            current_time += time_quantum
+            waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))                
+        # print("current process: ", continue_process.id)
+        # print("current time: ", current_time)
     average_waiting_time = waiting_time/float(len(process_list))
     return schedule, average_waiting_time
 

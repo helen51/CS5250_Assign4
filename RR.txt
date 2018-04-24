@@ -50,4 +50,4 @@
 (122, 2)
 (124, 3)
 (126, 2)
-average waiting time 1.75 
+average waiting time 29.50 

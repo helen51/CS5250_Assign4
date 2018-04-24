@@ -242,17 +242,15 @@ def SRTF_scheduling(process_list):
         next_arrive = 0
         if(index < len(process_list) - 1):
             next_arrive = process_list[index + 1].arrive_time
-        # if(current_time == process.arrive_time):
-        #     waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time, process.arrive_time))
-        #     waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
-        #     print("waiting_list while equal: ", waiting_list)
         while(current_time == process.arrive_time or len(waiting_list) != 0):
             if(current_time == process.arrive_time):
                 waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time, process.arrive_time))
                 waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
                 print("waiting_list while equal: ", waiting_list)
             continue_process = waiting_list.pop(0)
-            schedule.append((current_time, continue_process.id))
+            if(len(schedule) == 0 or schedule[len(schedule) - 1][1] != continue_process.id):
+                schedule.append((current_time, continue_process.id))
+            waiting_time += current_time - continue_process.stack_time
             if(next_arrive != 0):
                 time_interval = next_arrive - current_time
                 if(continue_process.burst_time > time_interval):
@@ -264,16 +262,12 @@ def SRTF_scheduling(process_list):
                     current_time += continue_process.burst_time
                     print("waiting_list while burst less or equal: ", waiting_list)
             else:
-                schedule.append((current_time, continue_process.id))
                 current_time += continue_process.burst_time
-            if(next_arrive != 0 and current_time == next_arrive):
-                break
-
-    while(len(waiting_list) != 0):
-        continue_process = waiting_list.pop(0)
-        schedule.append((current_time, continue_process.id))
-        waiting_time += current_time - continue_process.arrive_time
-        current_time += continue_process.burst_time
+            if(next_arrive != 0):
+                if(len(waiting_list) == 0):
+                    current_time = next_arrive
+                if(current_time == next_arrive):
+                    break
 
     average_waiting_time = waiting_time/float(len(process_list))
     return schedule, average_waiting_time

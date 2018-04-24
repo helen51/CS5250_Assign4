@@ -154,89 +154,120 @@ def SRTF_scheduling(process_list):
         print("waiting_list: ", waiting_list)
         # if(current_time < process.arrive_time):
         #     current_time = process.arrive_time
-        if(current_time = process.arrive_time):
-            index = process_list.index(process)
-            if(index < len(process_list)-1):
-                next_arrive = process_list[index+1].arrive_time
-                time_interval = next_arrive - current_time
-                if(time_interval < process.burst_time):
-                    current_time = next_arrive
-                    waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time - time_interval, current_time))
-                    waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
-                    print("waiting_list1: ", waiting_list)
-                else:
-                    current_time += process.burst_time
-                    while(len(waiting_list) != 0 and current_time < next_arrive):
-                        if(process.burst_time < waiting_list[0].burst_time):
-                            schedule.append((current_time, process.burst_time))
-                        else:
-                            schedule.append
-        while(current_time < process.arrive_time and len(waiting_list) != 0):
+        # if(current_time = process.arrive_time):
+        #     index = process_list.index(process)
+        #     if(index < len(process_list)-1):
+        #         next_arrive = process_list[index+1].arrive_time
+        #         time_interval = next_arrive - current_time
+        #         if(time_interval < process.burst_time):
+        #             current_time = next_arrive
+        #             waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time - time_interval, current_time))
+        #             waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
+        #             print("waiting_list1: ", waiting_list)
+        #         else:
+        #             current_time += process.burst_time
+        #             while(len(waiting_list) != 0 and current_time < next_arrive):
+        #                 if(process.burst_time < waiting_list[0].burst_time):
+        #                     schedule.append((current_time, process.burst_time))
+        #                 else:
+        #                     schedule.append
+        # while(current_time < process.arrive_time and len(waiting_list) != 0):
+        #     continue_process = waiting_list.pop(0)
+        #     schedule.append((current_time, continue_process.id))
+        #     waiting_time += current_time - continue_process.arrive_time
+        #     time_interval = process.arrive_time - current_time
+        #     if(continue_process.burst_time <= time_interval):
+        #         current_time += continue_process.burst_time
+        #     else:
+        #         current_time = process.arrive_time
+        #         waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time - time_interval, current_time))
+        #         waiting_list = sorted(waiting_list, key=lambda var: (var.burst_time, var.arrive_time))
+        #         print("waiting_list when current before arrive: ", waiting_list)
+        # if(len(waiting_list) == 0):
+        #     current_time = process.arrive_time
+        #     schedule.append((current_time, process.id))
+        #     waiting_time += current_time - process.arrive_time
+        #     index = process_list.index(process)
+        #     if(index < (len(process_list)-1)):
+        #         # still have next process coming in
+        #         next_arrive = process_list[index+1].arrive_time
+        #         time_interval = next_arrive - current_time
+        #         if(time_interval < process.burst_time):
+        #             current_time = next_arrive
+        #             waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time - time_interval, current_time))
+        #             waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
+        #             print("waiting_list1: ", waiting_list)
+        #         else:
+        #             current_time += process.burst_time
+        # else:
+        #     while(len(waiting_list) != 0):
+        #         if(waiting_list[0].burst_time <= process.burst_time):
+        #             continue_process = waiting_list.pop(0)
+        #             schedule.append((current_time, continue_process.id))
+        #             print("waiting list first schedule add: ", current_time, continue_process.id)
+        #             waiting_time += current_time - continue_process.arrive_time
+        #             index = process_list.index(process)
+        #             if(index < (len(process_list)-1)):
+        #                 # still have next process coming in
+        #                 next_arrive = process_list[index+1].arrive_time
+        #                 time_interval = next_arrive - current_time
+        #                 if(time_interval < continue_process.burst_time):
+        #                     current_time = next_arrive
+        #                     waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time - time_interval, current_time))
+        #                     waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time, process.arrive_time))
+        #                     waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
+        #                     print("waiting_list during while loop: ", waiting_list)
+        #                     break
+        #                 else:
+        #                     current_time += continue_process.burst_time
+        #         else:
+        #             schedule.append((current_time, process.id))
+        #             waiting_time += current_time - process.arrive_time
+        #             index = process_list.index(process)
+        #             if(index < (len(process_list)-1)):
+        #                 # still have next process coming in
+        #                 next_arrive = process_list[index+1].arrive_time
+        #                 time_interval = next_arrive - current_time
+        #                 print("next arrive time, time interval: ", next_arrive, time_interval)
+        #                 if(time_interval < process.burst_time):
+        #                     current_time = next_arrive
+        #                     waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time - time_interval, current_time))
+        #                     waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
+        #                     print("waiting_list: ", waiting_list)
+        #                 else:
+        #                     current_time += process.burst_time
+        #             break
+
+        index = process_list.index(process)
+        next_arrive = 0
+        if(index < len(process_list) - 1):
+            next_arrive = process_list[index + 1].arrive_time
+        # if(current_time == process.arrive_time):
+        #     waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time, process.arrive_time))
+        #     waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
+        #     print("waiting_list while equal: ", waiting_list)
+        while(current_time == process.arrive_time or len(waiting_list) != 0):
+            if(current_time == process.arrive_time):
+                waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time, process.arrive_time))
+                waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
+                print("waiting_list while equal: ", waiting_list)
             continue_process = waiting_list.pop(0)
             schedule.append((current_time, continue_process.id))
-            waiting_time += current_time - continue_process.arrive_time
-            time_interval = process.arrive_time - current_time
-            if(continue_process.burst_time <= time_interval):
-                current_time += continue_process.burst_time
-            else:
-                current_time = process.arrive_time
-                waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time - time_interval, current_time))
-                waiting_list = sorted(waiting_list, key=lambda var: (var.burst_time, var.arrive_time))
-                print("waiting_list when current before arrive: ", waiting_list)
-        if(len(waiting_list) == 0):
-            current_time = process.arrive_time
-            schedule.append((current_time, process.id))
-            waiting_time += current_time - process.arrive_time
-            index = process_list.index(process)
-            if(index < (len(process_list)-1)):
-                # still have next process coming in
-                next_arrive = process_list[index+1].arrive_time
+            if(next_arrive != 0):
                 time_interval = next_arrive - current_time
-                if(time_interval < process.burst_time):
-                    current_time = next_arrive
-                    waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time - time_interval, current_time))
+                if(continue_process.burst_time > time_interval):
+                    current_time += time_interval
+                    waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time - time_interval, current_time))
                     waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
-                    print("waiting_list1: ", waiting_list)
+                    print("waiting_list while burst more: ", waiting_list)
                 else:
-                    current_time += process.burst_time
-        else:
-            while(len(waiting_list) != 0):
-                if(waiting_list[0].burst_time <= process.burst_time):
-                    continue_process = waiting_list.pop(0)
-                    schedule.append((current_time, continue_process.id))
-                    print("waiting list first schedule add: ", current_time, continue_process.id)
-                    waiting_time += current_time - continue_process.arrive_time
-                    index = process_list.index(process)
-                    if(index < (len(process_list)-1)):
-                        # still have next process coming in
-                        next_arrive = process_list[index+1].arrive_time
-                        time_interval = next_arrive - current_time
-                        if(time_interval < continue_process.burst_time):
-                            current_time = next_arrive
-                            waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time - time_interval, current_time))
-                            waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time, process.arrive_time))
-                            waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
-                            print("waiting_list during while loop: ", waiting_list)
-                            break
-                        else:
-                            current_time += continue_process.burst_time
-                else:
-                    schedule.append((current_time, process.id))
-                    waiting_time += current_time - process.arrive_time
-                    index = process_list.index(process)
-                    if(index < (len(process_list)-1)):
-                        # still have next process coming in
-                        next_arrive = process_list[index+1].arrive_time
-                        time_interval = next_arrive - current_time
-                        print("next arrive time, time interval: ", next_arrive, time_interval)
-                        if(time_interval < process.burst_time):
-                            current_time = next_arrive
-                            waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time - time_interval, current_time))
-                            waiting_list = sorted(waiting_list, key=lambda var:(var.burst_time, var.arrive_time))
-                            print("waiting_list: ", waiting_list)
-                        else:
-                            current_time += process.burst_time
-                    break
+                    current_time += continue_process.burst_time
+                    print("waiting_list while burst less or equal: ", waiting_list)
+            else:
+                schedule.append((current_time, continue_process.id))
+                current_time += continue_process.burst_time
+            if(next_arrive != 0 and current_time == next_arrive):
+                break
 
     while(len(waiting_list) != 0):
         continue_process = waiting_list.pop(0)

@@ -68,70 +68,30 @@ def RR_scheduling(process_list, time_quantum ):
     waiting_list = []
     current_time = 0
     waiting_time = 0
+    index = 0
 
-    if(time_quantum <= 0):
-        # negative or zero time quantum is incorrect, change to default value, 5
-        time_quantum = 2
-
-    for process in process_list:
-        if(current_time < process.arrive_time):
-            while(len(waiting_list) != 0 and waiting_list[0].stack_time <= process.arrive_time):
-                continue_process = waiting_list.pop(0)
-                schedule.append((current_time, continue_process.id))
-                waiting_time += current_time - continue_process.arrive_time
-                if(continue_process.burst_time <= time_quantum):
-                    current_time += continue_process.burst_time
-                else:
-                    current_time += time_quantum
-                    waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))
-            if(len(waiting_list) == 0):
-                if(current_time < process.arrive_time):
-                    current_time = process.arrive_time
-                schedule.append((current_time, process.id))
-                waiting_time += current_time - process.arrive_time
-                if(process.burst_time <= time_quantum):
-                    current_time += process.burst_time
-                else:
-                    current_time += time_quantum
-                    waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
-            else:
-                schedule.append((current_time, process.id))
-                waiting_time += current_time - process.arrive_time
-                if(process.burst_time <= time_quantum):
-                    current_time += process.burst_time
-                else:
-                    current_time += time_quantum
-                    waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
-        else:
-            while(len(waiting_list) != 0):
-                if(waiting_list[0].stack_time <= process.arrive_time):
-                    continue_process = waiting_list.pop(0)
-                    schedule.append((current_time, continue_process.id))
-                    waiting_time += current_time - continue_process.arrive_time
-                    if(continue_process.burst_time <= time_quantum):
-                        current_time += continue_process.burst_time
-                    else:
-                        current_time += time_quantum
-                        waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))
-                else:
-                    break;
-            schedule.append((current_time, process.id))
-            waiting_time += current_time - process.arrive_time
-            if(process.burst_time <= time_quantum):
-                current_time += process.burst_time
-            else:
-                current_time += time_quantum
-                waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
-
-    while(len(waiting_list) != 0):
+    waiting_list.append(Stack_Process(process_list[index].id, process_list[index].arrive_time, process_list[index].burst_time, process_list[index].arrive_time))
+    index += 1
+    while(len(waiting_list) != 0 or index < len(process_list)):
+        if(len(waiting_list) == 0):
+            current_time = process_list[index].arrive_time
+            waiting_list.append(Stack_Process(process_list[index].id, process_list[index].arrive_time, process_list[index].burst_time, current_time))
+            index += 1
         continue_process = waiting_list.pop(0)
-        schedule.append((current_time, continue_process.id))
-        waiting_time += current_time - continue_process.arrive_time
-        if(continue_process.burst_time <= time_quantum):
-            current_time += continue_process.burst_time
-        else:
-            current_time += time_quantum
-            waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))                
+        if(len(schedule) == 0 or schedule[len(schedule)-1][1] != continue_process.id):
+            schedule.append((current_time, continue_process.id))
+        waiting_time += current_time - continue_process.stack_time
+        time_count = 0
+        while(time_count < continue_process.burst_time):
+            if(index < len(process_list) and current_time == process_list[index].arrive_time):
+                waiting_list.append(Stack_Process(process_list[index].id, process_list[index].arrive_time, process_list[index].burst_time, current_time))
+                index += 1
+            if(time_count >= time_quantum):
+                waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time - time_quantum, current_time))
+                break
+            else:
+                time_count += 1
+                current_time += 1
     average_waiting_time = waiting_time/float(len(process_list))
     return schedule, average_waiting_time
 
@@ -175,21 +135,20 @@ def SRTF_scheduling(process_list):
 
 def SJF_scheduling(process_list, alpha):
     schedule = []
-    waiting_list = []
     predict_list = {}
+    finished = {}
     current_time = 0
     waiting_time = 0
 
     for process in process_list:
         predict_list[process.id] = 5
+        finished[process] = False
     
     for process in process_list:
-        if(current_time >= process.arrive_time):
-            waiting_list.append(process)
-        print("current_time: ", current_time)
-        print("process: ", process)
-        print("waiting_list: ", waiting_list)
-        print("predict: ", predict_list)
+        waiting_list = []
+        for i in range(len(process_list)):
+            if(current_time >= process_list[i].arrive_time and finished[process_list[i]] != True):
+                waiting_list.append(process_list[i])
 
         if(len(waiting_list) == 0):
             current_time = process.arrive_time
@@ -197,13 +156,14 @@ def SJF_scheduling(process_list, alpha):
 
         min_index = 0
         for queue_process in waiting_list:
-            if(predict_list[process_list[min_index].id] > predict_list[queue_process.id]):
+            if(predict_list[waiting_list[min_index].id] > predict_list[queue_process.id]):
                 min_index = waiting_list.index(queue_process)
-        schedule.append((current_time, waiting_list[min_index].id))
+        if(len(schedule) == 0 or schedule[len(schedule) - 1][1] != waiting_list[min_index].id):
+            schedule.append((current_time, waiting_list[min_index].id))
+        finished[waiting_list[min_index]] = True
         if(current_time >= waiting_list[min_index].arrive_time):
             waiting_time += current_time - waiting_list[min_index].arrive_time
         current_time += waiting_list[min_index].burst_time
-        
 
         predict_list[waiting_list[min_index].id] = alpha * waiting_list[min_index].burst_time + (1-alpha)*predict_list[waiting_list[min_index].id]
         

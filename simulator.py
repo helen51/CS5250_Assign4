@@ -19,7 +19,6 @@ Revision 2:
     Thanks Lee Wei Ping for trying and pointing out the difficulty & ambiguity with future_prediction SRTF.
 '''
 import sys
-from operator import itemgetter, attrgetter, methodcaller
 
 input_file = 'input.txt'
 
@@ -123,10 +122,6 @@ def RR_scheduling(process_list, time_quantum ):
             else:
                 current_time += time_quantum
                 waiting_list.append(Stack_Process(process.id, process.arrive_time, process.burst_time-time_quantum, current_time))
-        # print("current process: ", process.id)
-        # print("current time: ", current_time)
-        # for wait in waiting_list:
-        #     print(wait)
 
     while(len(waiting_list) != 0):
         continue_process = waiting_list.pop(0)
@@ -137,8 +132,6 @@ def RR_scheduling(process_list, time_quantum ):
         else:
             current_time += time_quantum
             waiting_list.append(Stack_Process(continue_process.id, continue_process.arrive_time, continue_process.burst_time-time_quantum, current_time))                
-        # print("current process: ", continue_process.id)
-        # print("current time: ", current_time)
     average_waiting_time = waiting_time/float(len(process_list))
     return schedule, average_waiting_time
 
@@ -181,7 +174,43 @@ def SRTF_scheduling(process_list):
     return schedule, average_waiting_time
 
 def SJF_scheduling(process_list, alpha):
-    return (["to be completed, scheduling SJF without using information from process.burst_time"],0.0)
+    schedule = []
+    waiting_list = []
+    predict_list = {}
+    current_time = 0
+    waiting_time = 0
+
+    for process in process_list:
+        predict_list[process.id] = 5
+    
+    for process in process_list:
+        if(current_time >= process.arrive_time):
+            waiting_list.append(process)
+        print("current_time: ", current_time)
+        print("process: ", process)
+        print("waiting_list: ", waiting_list)
+        print("predict: ", predict_list)
+
+        if(len(waiting_list) == 0):
+            current_time = process.arrive_time
+            waiting_list.append(process)
+
+        min_index = 0
+        for queue_process in waiting_list:
+            if(predict_list[process_list[min_index].id] > predict_list[queue_process.id]):
+                min_index = waiting_list.index(queue_process)
+        schedule.append((current_time, waiting_list[min_index].id))
+        if(current_time >= waiting_list[min_index].arrive_time):
+            waiting_time += current_time - waiting_list[min_index].arrive_time
+        current_time += waiting_list[min_index].burst_time
+        
+
+        predict_list[waiting_list[min_index].id] = alpha * waiting_list[min_index].burst_time + (1-alpha)*predict_list[waiting_list[min_index].id]
+        
+        waiting_list.pop(min_index)
+
+    average_waiting_time = waiting_time / float(len(process_list))
+    return schedule, average_waiting_time
 
 
 def read_input():

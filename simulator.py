@@ -208,5 +208,22 @@ def main(argv):
     SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = 0.5)
     write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
 
+    RR_tuning = []
+    for time_quantum in range(1, 11):
+        RR_schedule, rr_awt = RR_scheduling(process_list, time_quantum)
+        RR_tuning.append((RR_schedule, rr_awt, time_quantum))
+        print("time_quantum: %d, rr_awt: %f" % (time_quantum, rr_awt))
+    RR_tuning = sorted(RR_tuning, key=lambda var: var[1])
+    print(RR_tuning[0])
+
+    SJF_tuning = []
+    for i in range(1, 11):
+        SJF_alpha = i * 0.1
+        SJF_schedule, SJF_awt =  SJF_scheduling(process_list, SJF_alpha)
+        SJF_tuning.append((SJF_schedule, SJF_awt, SJF_alpha))
+        print("When alpha: %f, SJF_awt: %f" % (SJF_alpha, SJF_awt))
+    SJF_tuning = sorted(SJF_tuning, key=lambda var: var[1])
+    print(SJF_tuning[0])
+
 if __name__ == '__main__':
     main(sys.argv[1:])

@@ -215,6 +215,7 @@ def main(argv):
         print("time_quantum: %d, rr_awt: %f" % (time_quantum, rr_awt))
     RR_tuning = sorted(RR_tuning, key=lambda var: var[1])
     print(RR_tuning[0])
+    write_output('RR_optimal.txt', RR_tuning[0][0], RR_tuning[0][1] )
 
     SJF_tuning = []
     for i in range(1, 11):
@@ -224,6 +225,7 @@ def main(argv):
         print("When alpha: %f, SJF_awt: %f" % (SJF_alpha, SJF_awt))
     SJF_tuning = sorted(SJF_tuning, key=lambda var: var[1])
     print(SJF_tuning[0])
+    write_output('SJF_optimal.txt', SJF_tuning[0][0], SJF_tuning[0][1] )
 
 if __name__ == '__main__':
     main(sys.argv[1:])

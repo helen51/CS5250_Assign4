@@ -218,7 +218,7 @@ def main(argv):
     write_output('RR_optimal.txt', RR_tuning[0][0], RR_tuning[0][1] )
 
     SJF_tuning = []
-    for i in range(1, 11):
+    for i in range(0, 11):
         SJF_alpha = i * 0.1
         SJF_schedule, SJF_awt =  SJF_scheduling(process_list, SJF_alpha)
         SJF_tuning.append((SJF_schedule, SJF_awt, SJF_alpha))
